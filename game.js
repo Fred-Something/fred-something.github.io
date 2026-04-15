@@ -1,13 +1,25 @@
 var board = [
-  [0, 1, 1, 0, 0],
-  [0, 5, 0, 0, 0],
+  [0, 6, 6, 0, 0],
+  [0, 5, 0, 1, 0],
   [0, 0, 2, 2, 0],
   [0, 0, 0, 0, 0]
 ];
 
-// const player = [5, 6]
-const visual = ['', '#', 'B', '?', '!', 'P', 'p']
-const solid = [2, 4, 1]
+/*
+EMPTY = 0
+GOAL = 1
+BOX = 2
+GOAL_BOX = 3
+PLAYER = 4
+GOAL_PLAYER = 5
+WALL = 6
+*/
+
+const player = [4, 5]
+const box = [2, 3]
+const goal = [1, 3, 5]
+const visual = ['', '?', 'B', '!', 'P', 'p', '#']
+const solid = [2, 4, 6]
 
 // var boxes = [[2, 2], [2, 3]]
 var width = board[0].length;
@@ -31,7 +43,7 @@ function move_player(dx, dy) {
   let px = 0, py = 0;
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
-      if (board[y][x] === 5) {
+      if (player.includes(board[y][x])) {
         px = x;
         py = y;
       }
@@ -40,22 +52,22 @@ function move_player(dx, dy) {
   const nx = px + dx;
   const ny = py + dy;
   if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
-    if (board[ny][nx] === 2) {
+    if (box.includes(board[ny][nx])) {
       const mx = nx + dx;
       const my = ny + dy;
 
       if (mx >= 0 && mx < width && my >= 0 && my < height && !solid.includes(board[my][mx])) {
-        board[py][px] = 0;
-        board[ny][nx] = 5;
-        board[my][mx] = 2;
+        board[py][px] -= 4;
+        board[ny][nx] += 4 - 2;
+        board[my][mx] += 2;
       }
     }
     else if (solid.includes(board[ny][nx])) {
       return;
     }
     else {
-      board[py][px] = 0;
-      board[ny][nx] = 5;
+      board[py][px] -= 4;
+      board[ny][nx] += 4;
     }
     render();
   }
