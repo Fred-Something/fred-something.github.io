@@ -28,6 +28,7 @@ const player = [4, 5]
 const box = [2, 3]
 const goal = [1, 3, 5]
 const visual = ['', '?', 'B', '!', 'P', 'p', '#']
+const images = ['empty.png', 'goal-empty.png', 'box.png', 'goal-full.png', 'player.png', 'goal-player.png', 'wall.png'];
 const solid = [2, 4, 6]
 
 // var boxes = [[2, 2], [2, 3]]
@@ -48,7 +49,11 @@ function render() {
     for (let x = 0; x < width; x++) {
       const cell = document.createElement('div');
       cell.className = 'cell';
-      cell.textContent = visual[board[y][x]];
+      const img = document.createElement('img');
+      img.src = `img/${images[board[y][x]]}`;
+      img.style.width = '100%';
+      img.style.height = '100%';
+      cell.appendChild(img);
       game_element.appendChild(cell);
     }
   }
