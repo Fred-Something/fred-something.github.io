@@ -7,8 +7,7 @@ var board = [
 
 // TODO
 /*
-Reset and undo buttons and tutorial tip
-Nice visuals
+Win detection
 Text file with puzzles to pull from
 Ranking options
 Database
@@ -31,12 +30,8 @@ const visual = ['', '?', 'B', '!', 'P', 'p', '#']
 const images = ['empty.png', 'goal-empty.png', 'box.png', 'goal-full.png', 'player.png', 'goal-player.png', 'wall.png'];
 const solid = [2, 4, 6]
 
-// var boxes = [[2, 2], [2, 3]]
-// var start = [];
-
-// for (var i = 0; i < start.length; i++)
-//     start[i] = board[i].slice();
 var moves = []
+var solved = false
 
 var width = board[0].length;
 var height = board.length;
@@ -45,6 +40,14 @@ game_element.style.gridTemplateColumns = `repeat(${width}, 40px)`;
 
 function render() {
   game_element.innerHTML = '';
+
+  if (solved) {
+    const winMessage = document.createElement('div');
+    winMessage.className = 'win-message';
+    winMessage.textContent = 'You win!!!';
+    game_element.appendChild(winMessage);
+  }
+
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
       const cell = document.createElement('div');
@@ -57,6 +60,16 @@ function render() {
       game_element.appendChild(cell);
     }
   }
+}
+
+function check_win() {
+  for (const row of board) {
+    if (row.includes(1)) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 function move_player(dx, dy) {
@@ -81,6 +94,8 @@ function move_player(dx, dy) {
         board[ny][nx] += 4 - 2;
         board[my][mx] += 2;
         moves.push([dx, dy, true])
+        if (check_win()) solved = true;
+        // Udpate board to display win?
       }
     }
     else if (solid.includes(board[ny][nx])) {
@@ -130,14 +145,10 @@ function undo() {
 }
 
 function reset() {
-  // board = [];
-
-  // for (var i = 0; i < start.length; i++)
-  //   board[i] = start[i].slice();
-  // moves = [];
   while (moves.length > 0) {
     undo()
   }
+  solved = false
 
   render();
 }
@@ -151,11 +162,8 @@ function reroll() {
     [0, 0, 0]
   ]
 
-  // var start = [];
-
-  // for (var i = 0; i < start.length; i++)
-  //   start[i] = board[i].slice();
-  var moves = []
+  moves = []
+  solved = false
 
   width = board[0].length;
   height = board.length;
