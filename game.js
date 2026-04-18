@@ -5,6 +5,15 @@ var board = [
   [0, 0, 0, 0, 0]
 ];
 
+// TODO
+/*
+Reset and undo buttons and tutorial tip
+Nice visuals
+Text file with puzzles to pull from
+Ranking options
+Database
+*/
+
 /*
 EMPTY = 0
 GOAL = 1
@@ -22,6 +31,12 @@ const visual = ['', '?', 'B', '!', 'P', 'p', '#']
 const solid = [2, 4, 6]
 
 // var boxes = [[2, 2], [2, 3]]
+// var start = [];
+
+// for (var i = 0; i < start.length; i++)
+//     start[i] = board[i].slice();
+var moves = []
+
 var width = board[0].length;
 var height = board.length;
 var game_element = document.getElementById('game');
@@ -60,6 +75,7 @@ function move_player(dx, dy) {
         board[py][px] -= 4;
         board[ny][nx] += 4 - 2;
         board[my][mx] += 2;
+        moves.push([dx, dy, true])
       }
     }
     else if (solid.includes(board[ny][nx])) {
@@ -68,9 +84,57 @@ function move_player(dx, dy) {
     else {
       board[py][px] -= 4;
       board[ny][nx] += 4;
+      moves.push([dx, dy, false])
     }
     render();
   }
+}
+
+function undo() {
+  var move = moves.pop()
+
+  if (!move) return;
+
+  let px = 0, py = 0;
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      if (player.includes(board[y][x])) {
+        px = x;
+        py = y;
+      }
+    }
+  }
+  const dx = move[0]
+  const dy = move[1] 
+
+  const nx = px - dx;
+  const ny = py - dy;
+
+  board[py][px] -= 4;
+  board[ny][nx] += 4;
+
+  if (move[2]) {
+    const mx = px + dx;
+    const my = py + dy;
+
+    board[my][mx] -= 2;
+    board[py][px] += 2;
+  }
+
+  render()
+}
+
+function reset() {
+  // board = [];
+
+  // for (var i = 0; i < start.length; i++)
+  //   board[i] = start[i].slice();
+  // moves = [];
+  while (moves.length > 0) {
+    undo()
+  }
+
+  render();
 }
 
 function reroll() {
@@ -82,6 +146,12 @@ function reroll() {
     [0, 0, 0]
   ]
 
+  // var start = [];
+
+  // for (var i = 0; i < start.length; i++)
+  //   start[i] = board[i].slice();
+  var moves = []
+
   width = board[0].length;
   height = board.length;
   game_element = document.getElementById('game');
@@ -91,14 +161,20 @@ function reroll() {
 }
 
 document.addEventListener('keydown', event => {
-  const moves = {
+  const inputs = {
     ArrowUp: [0, -1],
     ArrowDown: [0, 1],
     ArrowLeft: [-1, 0],
-    ArrowRight: [1, 0]
+    ArrowRight: [1, 0],
   };
-  if (moves[event.key]) {
-    move_player(...moves[event.key]);
+  if (inputs[event.key]) {
+    move_player(...inputs[event.key]);
+  }
+  else if (event.key === "z") {
+    undo();
+  }
+  else if (event.key === "r") {
+    reset();
   }
 });
 
@@ -107,6 +183,8 @@ document.getElementById('down').onclick = () => move_player(0, 1);
 document.getElementById('left').onclick = () => move_player(-1, 0);
 document.getElementById('right').onclick = () => move_player(1, 0);
 
+document.getElementById('undo').onclick = () => undo();
+document.getElementById('reset').onclick = () => reset();
 document.getElementById('next').onclick = () => reroll();
 
 render();
